@@ -1,0 +1,3 @@
+meter_id,fuel,label,notes
+electric-main,electricity,Campus electricity,Sample meter. Meter ids are made-up names and never the number on the bill.
+gas-main,natural_gas,Campus natural gas,Sample meter.

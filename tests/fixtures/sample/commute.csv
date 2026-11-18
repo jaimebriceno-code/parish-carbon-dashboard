@@ -1,0 +1,13 @@
+vehicle_id,period_end_month,miles,data_quality,note
+staff-ev,2025-11,500,estimate,Sample: 25 miles x 20 weekdays
+staff-ev,2025-12,575,estimate,Sample: 25 miles x 23 weekdays
+staff-ev,2026-01,550,estimate,Sample: 25 miles x 22 weekdays
+staff-ev,2026-02,500,estimate,Sample: 25 miles x 20 weekdays
+staff-ev,2026-03,550,estimate,Sample: 25 miles x 22 weekdays
+staff-ev,2026-04,550,estimate,Sample: 25 miles x 22 weekdays
+staff-ev,2026-05,525,estimate,Sample: 25 miles x 21 weekdays
+staff-ev,2026-06,550,estimate,Sample: 25 miles x 22 weekdays
+staff-ev,2026-07,575,estimate,Sample: 25 miles x 23 weekdays
+staff-ev,2026-08,525,estimate,Sample: 25 miles x 21 weekdays
+staff-ev,2026-09,550,estimate,Sample: 25 miles x 22 weekdays
+staff-ev,2026-10,550,estimate,Sample: 25 miles x 22 weekdays
