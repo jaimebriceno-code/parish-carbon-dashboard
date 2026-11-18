@@ -1,0 +1,68 @@
+{% extends "base.html.j2" %}
+{% block main %}
+ <div class="intro">
+  <h1>{{ t("data_h1") }}</h1>
+  <p>{{ t("data_intro") }}</p>
+ </div>
+
+ <section class="card" id="table" aria-labelledby="h-table">
+  <h2 id="h-table">{{ t("data_table_heading") }}</h2>
+{% if v.rows %}
+  <div class="tablewrap" role="region" aria-labelledby="cap-table" tabindex="0">
+   <table>
+    <caption id="cap-table">{{ t("data_table_caption") }}</caption>
+    <thead><tr><th scope="col">{{ t("col_month") }}</th><th scope="col">{{ t("col_fuel") }}</th><th scope="col" class="num">{{ t("col_quantity") }}</th><th scope="col">{{ t("col_unit") }}</th><th scope="col" class="num">{{ t("col_scope") }}</th><th scope="col" class="num">{{ t("col_tco2e") }}</th><th scope="col">{{ t("col_source") }}</th></tr></thead>
+    <tbody>
+{% for r in v.rows %}
+     <tr><th scope="row">{{ r.month }}</th><td>{{ r.fuel }}</td><td class="num">{{ r.quantity }}</td><td>{{ r.unit }}</td><td class="num">{{ r.scope }}</td><td class="num">{{ r.tco2e }}</td><td>{{ r.source }}</td></tr>
+{% endfor %}
+    </tbody>
+   </table>
+  </div>
+{% else %}
+  <p>{{ t("data_none_yet") }}</p>
+{% endif %}
+ </section>
+
+{% if v.has_travel %}
+ <section class="card travel" id="travel" aria-labelledby="h-travel">
+  <span class="tag">{{ t("travel_tag") }}</span>
+  <h2 id="h-travel">{{ t("travel_heading") }}</h2>
+  <p class="category">{{ t("travel_category") }}</p>
+  <div class="tablewrap" role="region" aria-labelledby="cap-travel" tabindex="0">
+   <table>
+    <caption id="cap-travel">{{ t("travel_table_caption") }}</caption>
+    <thead><tr><th scope="col">{{ t("col_month") }}</th><th scope="col" class="num">{{ t("col_miles") }}</th><th scope="col" class="num">{{ t("col_travel_tco2e") }}</th><th scope="col" class="num">{{ t("col_avoided") }}</th><th scope="col">{{ t("col_source") }}</th></tr></thead>
+    <tbody>
+{% for r in v.travel_rows %}
+     <tr><th scope="row">{{ r.month }}</th><td class="num">{{ r.miles }}</td><td class="num">{{ r.charging }}</td><td class="num">{{ r.avoided }}</td><td>{{ r.source }}</td></tr>
+{% endfor %}
+    </tbody>
+   </table>
+  </div>
+ </section>
+{% endif %}
+
+ <div class="grid2">
+  <section class="card" id="download" aria-labelledby="h-download">
+   <h2 id="h-download">{{ t("data_download_heading") }}</h2>
+   <p class="actions"><a class="button" href="{{ feed }}monthly.csv">{{ t("data_download_csv") }}</a> <a class="button" href="{{ feed }}monthly.json">{{ t("data_download_json") }}</a></p>
+   <ul class="files">
+    <li><a href="{{ feed }}index.json">{{ t("data_file_index") }}</a></li>
+    <li><a href="{{ feed }}monthly.json">{{ t("data_file_monthly") }}</a></li>
+    <li><a href="{{ feed }}annual.json">{{ t("data_file_annual") }}</a></li>
+{% if v.has_travel %}
+    <li><a href="{{ feed }}travel.json">{{ t("data_file_travel") }}</a> (<a href="{{ feed }}travel.csv">CSV</a>)</li>
+{% endif %}
+    <li><a href="{{ feed }}factors.json">{{ t("data_file_factors") }}</a></li>
+    <li><a href="{{ feed }}milestones.json">{{ t("data_file_milestones") }}</a></li>
+    <li><a href="{{ feed }}openapi.json">{{ t("data_file_schema") }}</a></li>
+   </ul>
+  </section>
+  <section class="card" id="open-data" aria-labelledby="h-open">
+   <h2 id="h-open">{{ t("opendata_heading") }}</h2>
+   <p>{{ t("opendata_body", license=license_name)|linkify }}</p>
+   <p>{{ t("opendata_contact", contact=contact)|linkify }}</p>
+  </section>
+ </div>
+{% endblock %}

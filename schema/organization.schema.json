@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Organization (v1)",
+  "description": "Who publishes the feed, the campus boundary and the meters included. Unknown extra fields are allowed.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "slug", "name", "city", "state", "zip", "campus", "boundary", "meters"],
+  "properties": {
+    "version": { "const": "v1" },
+    "slug": { "type": "string", "description": "Stable identifier for the organization." },
+    "name": { "type": "string" },
+    "city": { "type": "string" },
+    "state": { "type": "string" },
+    "zip": { "type": "string", "description": "ZIP code, as text." },
+    "campus": { "type": "string", "description": "Plain-language description of the campus." },
+    "egrid_subregion": {
+      "type": "string",
+      "description": "The EPA eGRID subregion whose emission rate prices the campus electricity, for example RFCW. Optional."
+    },
+    "sample_data": {
+      "type": "boolean",
+      "description": "True while the site still shows the template's made-up sample numbers. Optional: when absent, treat as false."
+    },
+    "website": { "type": "string", "description": "The parish's own website, when it has given one. Optional." },
+    "boundary": {
+      "type": "string",
+      "description": "What the reported emissions cover and what they leave out."
+    },
+    "meters": {
+      "type": "array",
+      "description": "The meters inside the boundary, by generic id. Real meter or account numbers are never published.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["meter_id", "fuel", "label"],
+        "properties": {
+          "meter_id": { "type": "string", "description": "Generic id used by monthly.json." },
+          "fuel": { "type": "string", "description": "electricity or natural_gas." },
+          "label": { "type": "string" }
+        }
+      }
+    }
+  }
+}

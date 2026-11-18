@@ -1,0 +1,47 @@
+{% extends "base.html.j2" %}
+{% block main %}
+ <div class="intro">
+  <h1>{{ t("about_h1") }}</h1>
+ </div>
+
+ <section class="card" id="why" aria-labelledby="h-why">
+  <h2 id="h-why">{{ t("about_why_heading") }}</h2>
+  <p>{{ t("about_why_body") }}</p>
+{% if v.website %}
+  <p>{{ t("about_website_intro") }} <a href="{{ v.website }}">{{ v.name }}</a></p>
+{% endif %}
+ </section>
+
+ <section class="card" id="campus" aria-labelledby="h-campus">
+  <h2 id="h-campus">{{ t("about_campus_heading") }}</h2>
+  <p>{{ t("about_campus_body") }}</p>
+ </section>
+
+ <section class="card" id="updates" aria-labelledby="h-updates">
+  <h2 id="h-updates">{{ t("about_updates_heading") }}</h2>
+  <p>{{ t("about_updates_body") }}</p>
+ </section>
+
+{% if v.solar %}
+ <section class="card" id="solar" aria-labelledby="h-solar">
+  <h2 id="h-solar">{{ t("about_solar_heading") }}</h2>
+  <p>{{ t("about_solar_body" if v.solar.exact_day else "about_solar_body_period", date=v.solar.date) }}</p>
+ </section>
+{% endif %}
+
+{% if v.milestones %}
+ <section class="card" id="milestones" aria-labelledby="h-milestones">
+  <h2 id="h-milestones">{{ t("milestones_heading") }}</h2>
+  <ul class="milestones">
+{% for m in v.milestones %}
+   <li><time datetime="{{ m.iso }}">{{ m.date }}</time> <span>{{ m.label }}</span></li>
+{% endfor %}
+  </ul>
+ </section>
+{% endif %}
+
+ <section class="card" id="contact" aria-labelledby="h-contact">
+  <h2 id="h-contact">{{ t("about_contact_heading") }}</h2>
+  <p>{{ t("about_contact_body", contact=contact)|linkify }}</p>
+ </section>
+{% endblock %}

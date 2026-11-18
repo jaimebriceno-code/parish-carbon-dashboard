@@ -1,0 +1,9 @@
+.venv/
+dist/
+.*.stage-*/
+.*.old-*/
+__pycache__/
+.pytest_cache/
+.env
+*.pdf
+inventory.ndjson

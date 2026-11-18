@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Monthly campus emissions (v1)",
+  "description": "One row per meter per billing month, ordered by meter id then month. Billing months are labelled by the month the billing period ends, with no pro-rating. Unknown extra fields are allowed.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "emissions_unit", "rows"],
+  "properties": {
+    "version": { "const": "v1" },
+    "emissions_unit": { "type": "string", "description": "tCO2e: metric tonnes of carbon dioxide equivalent." },
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": [
+          "meter_id",
+          "fuel",
+          "scope",
+          "period_end_month",
+          "quantity",
+          "unit",
+          "tco2e",
+          "data_quality",
+          "estimated",
+          "uncertainty_pct",
+          "factor_id"
+        ],
+        "properties": {
+          "meter_id": { "type": "string" },
+          "fuel": { "type": "string", "description": "electricity or natural_gas." },
+          "scope": { "type": "integer", "enum": [1, 2], "description": "1 for natural gas, 2 for purchased electricity (location-based)." },
+          "period_end_month": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$", "description": "YYYY-MM, the month the billing period ends." },
+          "quantity": { "type": "number", "description": "Energy used in the billing month, in unit." },
+          "unit": { "type": "string", "description": "kWh for electricity, therm for natural gas." },
+          "tco2e": { "type": "number", "description": "Metric tonnes CO2e, rounded to six decimal places." },
+          "data_quality": {
+            "type": "string",
+            "description": "Where the figure came from: bill, utility_export, chart_estimate or chart_measured. New values may be added."
+          },
+          "estimated": { "type": "boolean", "description": "True unless the figure is an exact bill or utility export figure." },
+          "uncertainty_pct": { "type": ["number", "null"], "description": "Stated uncertainty in percent, where one is given." },
+          "factor_id": { "type": "string", "description": "The factor_id in factors.json used for this row." }
+        }
+      }
+    }
+  }
+}

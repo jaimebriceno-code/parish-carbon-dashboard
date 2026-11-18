@@ -1,0 +1,152 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Annual campus emissions and staff travel (v1)",
+  "description": "The baseline and every complete twelve-month period of billing months, with campus totals by fuel (scope 1 and 2). Staff travel (scope 3) is a separate block, present only when the parish reports a travel line, and is never added to the campus totals. Unknown extra fields are allowed.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "emissions_unit", "campus"],
+  "properties": {
+    "version": { "const": "v1" },
+    "emissions_unit": { "type": "string", "description": "tCO2e: metric tonnes of carbon dioxide equivalent." },
+    "sample_data": {
+      "type": "boolean",
+      "description": "True while these are the template's made-up sample numbers, not a parish's own. Optional: when absent, treat as false."
+    },
+    "campus": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["baseline", "periods"],
+      "properties": {
+        "baseline": {
+          "description": "The baseline period, or null when no twelve consecutive billing months are complete for every meter and both fuels.",
+          "anyOf": [{ "$ref": "#/$defs/baseline" }, { "type": "null" }]
+        },
+        "periods": {
+          "type": "array",
+          "description": "Every complete twelve-month period, oldest first. Empty when there is none. These are rolling twelve-month windows, one per end month, so each overlaps the next by eleven months: they are not separate years and must not be added together. Use baseline as the single figure for the campus footprint.",
+          "items": { "$ref": "#/$defs/period" }
+        }
+      }
+    },
+    "staff_travel": {
+      "type": "object",
+      "description": "Church-related driving by clergy and staff in an electric vehicle. Scope 3, reported on its own and never added to the campus totals. Absent when the parish does not report a travel line.",
+      "additionalProperties": true,
+      "required": [
+        "scope",
+        "ghg_category",
+        "included_in_campus_totals",
+        "emissions_unit",
+        "avoided_note",
+        "counted_in_campus_note",
+        "vehicles"
+      ],
+      "properties": {
+        "scope": { "const": 3 },
+        "ghg_category": { "type": "string", "description": "business_travel." },
+        "included_in_campus_totals": { "const": false },
+        "emissions_unit": { "type": "string" },
+        "avoided_note": { "type": "string", "description": "How to read the avoided figure: compared with a gasoline car, not subtracted from campus totals." },
+        "counted_in_campus_note": { "type": "string" },
+        "vehicles": {
+          "type": "array",
+          "description": "One entry per vehicle slug that has travel months. Empty when there is none.",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["vehicle_id", "counted_in_campus", "periods"],
+            "properties": {
+              "vehicle_id": { "type": "string", "description": "A made-up slug; the vehicle model is not published." },
+              "counted_in_campus": {
+                "type": "boolean",
+                "description": "True when the vehicle charges at the church, so its electricity is already in the campus electricity figure."
+              },
+              "periods": {
+                "type": "array",
+                "description": "The campus periods that hold at least one travel month for this vehicle.",
+                "items": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "required": [
+                    "label",
+                    "months_reported",
+                    "complete",
+                    "miles",
+                    "tco2e_counted_here",
+                    "avoided_tco2e",
+                    "includes_estimates"
+                  ],
+                  "properties": {
+                    "label": { "type": "string", "description": "Matches the label of a campus period." },
+                    "months_reported": { "type": "integer", "minimum": 1 },
+                    "complete": { "type": "boolean", "description": "True when all twelve months of the period are reported. Otherwise the totals cover only the months reported." },
+                    "miles": { "type": "number" },
+                    "tco2e_counted_here": {
+                      "type": ["number", "null"],
+                      "description": "Emissions counted here, or null when the vehicle charges at the church and they are already counted in campus electricity."
+                    },
+                    "avoided_tco2e": { "type": "number", "description": "Avoided emissions compared with a gasoline car. Informational." },
+                    "includes_estimates": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "fuel_total": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["scope", "quantity", "unit", "tco2e"],
+      "properties": {
+        "scope": { "type": "integer", "enum": [1, 2] },
+        "quantity": { "type": "number", "description": "Energy over the twelve months, in unit." },
+        "unit": { "type": "string" },
+        "tco2e": { "type": "number", "description": "Metric tonnes CO2e, rounded to six decimal places." }
+      }
+    },
+    "period": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["label", "months", "electricity", "natural_gas", "tco2e_total", "estimated_share", "includes_estimates", "provisional"],
+      "properties": {
+        "label": { "type": "string", "description": "The parish's baseline calendar year, such as 2025, for January to December of that year; otherwise first month to last month, YYYY-MM to YYYY-MM." },
+        "months": {
+          "type": "array",
+          "description": "The twelve billing months, oldest first.",
+          "minItems": 12,
+          "maxItems": 12,
+          "items": { "type": "string", "pattern": "^\\d{4}-(0[1-9]|1[0-2])$" }
+        },
+        "electricity": { "$ref": "#/$defs/fuel_total" },
+        "natural_gas": { "$ref": "#/$defs/fuel_total" },
+        "tco2e_total": { "type": "number", "description": "Scope 1 plus scope 2, metric tonnes CO2e. Never includes staff travel." },
+        "estimated_share": { "type": "number", "minimum": 0, "maximum": 1, "description": "Fraction of tco2e_total that comes from estimated readings." },
+        "includes_estimates": { "type": "boolean", "description": "True while any reading in the period is an estimate." },
+        "provisional": {
+          "type": "boolean",
+          "description": "True while the figure may still change: any estimated reading, or a baseline that is not yet the parish's baseline calendar year."
+        }
+      }
+    },
+    "baseline": {
+      "allOf": [
+        { "$ref": "#/$defs/period" },
+        {
+          "type": "object",
+          "additionalProperties": true,
+          "required": ["basis"],
+          "properties": {
+            "basis": {
+              "type": "string",
+              "description": "calendar_ and the parish's baseline year (for example calendar_2025) when January to December of that year is complete, otherwise latest_twelve_billing_months."
+            }
+          }
+        }
+      ]
+    }
+  }
+}

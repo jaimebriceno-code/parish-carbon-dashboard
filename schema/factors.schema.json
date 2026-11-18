@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Emission factors (v1)",
+  "description": "Every emission factor this parish's figures use, with its source: natural gas, the electricity rate of its own eGRID subregion (electricity_ and the subregion in lower case) and, with a travel line, the gasoline-car comparison. Unknown extra fields are allowed.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "factors"],
+  "properties": {
+    "version": { "const": "v1" },
+    "factors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["factor_id", "value", "unit", "gases", "source", "edition", "revision", "url", "retrieved"],
+        "properties": {
+          "factor_id": { "type": "string" },
+          "value": { "type": "number", "description": "Kilograms CO2e per unit." },
+          "unit": { "type": "string", "description": "For example kg CO2e/kWh." },
+          "gases": { "type": "string", "description": "Which gases are included and the global warming potentials used." },
+          "source": { "type": "string", "description": "Where the value comes from, with the unit conversion." },
+          "edition": { "type": "string" },
+          "revision": { "type": "string" },
+          "url": { "type": "string" },
+          "retrieved": { "type": "string", "description": "Date the value was fetched from the source." }
+        }
+      }
+    }
+  }
+}

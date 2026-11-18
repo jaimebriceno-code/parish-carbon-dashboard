@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Carbon feed index (v1)",
+  "description": "Discovery document for a parish carbon data feed. Every parish built from the same template publishes this shape. Unknown extra fields are allowed: within v1 only additive changes are made.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "generated_at", "organization", "licence", "contact", "files"],
+  "properties": {
+    "version": {
+      "const": "v1",
+      "description": "The feed version. A breaking change creates v2 and leaves v1 up."
+    },
+    "generated_at": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "description": "The date this feed was last built, YYYY-MM-DD."
+    },
+    "organization": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["slug", "name", "city", "state", "zip"],
+      "properties": {
+        "slug": { "type": "string", "description": "Stable identifier for the organization." },
+        "name": { "type": "string" },
+        "city": { "type": "string" },
+        "state": { "type": "string" },
+        "zip": { "type": "string", "description": "ZIP code, as text." }
+      }
+    },
+    "licence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["name", "url"],
+      "properties": {
+        "name": { "type": "string", "description": "Data licence name, CC BY 4.0." },
+        "url": { "type": "string" }
+      }
+    },
+    "contact": { "type": "string", "description": "Email address for questions about the data." },
+    "sample_data": {
+      "type": "boolean",
+      "description": "True while the site still shows the template's made-up sample numbers. A reader adding parishes up must skip a feed that says true. Optional: when absent, treat as false."
+    },
+    "languages": {
+      "type": "array",
+      "description": "The languages the website is built in, English first: en, or en and es. Optional.",
+      "items": { "type": "string" }
+    },
+    "files": {
+      "type": "object",
+      "description": "Every file in the feed, keyed by a stable id. Each path is relative to this document. travel and travel_csv are present only when the parish reports a travel line.",
+      "additionalProperties": true,
+      "required": [
+        "index",
+        "organization",
+        "monthly",
+        "monthly_csv",
+        "annual",
+        "factors",
+        "milestones",
+        "openapi",
+        "changelog"
+      ],
+      "properties": {
+        "index": { "$ref": "#/$defs/file" },
+        "organization": { "$ref": "#/$defs/file" },
+        "monthly": { "$ref": "#/$defs/file" },
+        "monthly_csv": { "$ref": "#/$defs/file" },
+        "annual": { "$ref": "#/$defs/file" },
+        "travel": { "$ref": "#/$defs/file" },
+        "travel_csv": { "$ref": "#/$defs/file" },
+        "factors": { "$ref": "#/$defs/file" },
+        "milestones": { "$ref": "#/$defs/file" },
+        "openapi": { "$ref": "#/$defs/file" },
+        "changelog": { "$ref": "#/$defs/file" }
+      }
+    }
+  },
+  "$defs": {
+    "file": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["path", "media_type", "description"],
+      "properties": {
+        "path": { "type": "string", "description": "Location relative to this document." },
+        "media_type": { "type": "string" },
+        "description": { "type": "string" },
+        "schema": { "type": "string", "description": "Location of the JSON Schema for this file, relative to this document. Absent for files without one." }
+      }
+    }
+  }
+}

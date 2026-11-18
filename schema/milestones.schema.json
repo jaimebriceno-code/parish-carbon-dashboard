@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Milestones (v1)",
+  "description": "Dated events that can change energy use, such as a boiler installation. Unknown extra fields are allowed.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["version", "milestones"],
+  "properties": {
+    "version": { "const": "v1" },
+    "milestones": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["date", "kind", "label_en", "label_es"],
+        "properties": {
+          "date": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+          "date_precision": {
+            "type": "string",
+            "enum": ["year", "month", "day"],
+            "description": "How much of date is known. For year only the year is meant (date is then 1 January of that year); for month only the year and month (date is then the first day of that month); for day the whole date. Optional: when absent, treat as day."
+          },
+          "kind": { "type": "string", "description": "For example boiler, solar_connected or other. New values may be added." },
+          "label_en": { "type": "string" },
+          "label_es": { "type": "string", "description": "Empty when the site is built in English only." }
+        }
+      }
+    }
+  }
+}

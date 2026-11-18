@@ -1,0 +1,108 @@
+{% extends "base.html.j2" %}
+{% block main %}
+ <div class="intro">
+  <h1>{{ t("home_h1") }}</h1>
+  <p>{{ t("home_intro") }}</p>
+ </div>
+
+{% set b = v.baseline %}
+{% if b %}
+ <section class="card hero" aria-labelledby="h-total">
+  <div>
+   <p class="eyebrow">{{ b.eyebrow }}</p>
+   <h2 class="big" id="h-total">{{ b.total }} <small>{{ t("home_tonnes_unit") }}</small></h2>
+   <p class="lead">{{ t("home_lead") }}</p>
+   <span class="badge">{{ b.badge }}</span>
+  </div>
+  <div>
+   <div class="split" role="img" aria-label="{{ b.split_label }}"><span class="g" style="width:{{ b.share_gas }}%"></span><span class="e" style="width:{{ b.share_electricity }}%"></span></div>
+   <div class="tiles">
+    <div class="tile"><div class="k"><span class="sw g" aria-hidden="true"></span>{{ t("fuel_gas") }}</div><div class="v">{{ b.gas_t }} t</div><div class="s">{{ t("home_tile_gas_detail", therms=b.therms, share=b.share_gas) }}</div></div>
+    <div class="tile"><div class="k"><span class="sw e" aria-hidden="true"></span>{{ t("fuel_electricity") }}</div><div class="v">{{ b.electricity_t }} t</div><div class="s">{{ t("home_tile_electricity_detail", kwh=b.kwh, share=b.share_electricity) }}</div></div>
+   </div>
+  </div>
+ </section>
+{% if b.reasons %}
+ <div class="pending after-hero">
+  <p><strong>{{ t("home_why_lead") }}</strong></p>
+  <ul>
+{% for key in b.reasons %}
+   <li>{{ t(key) }}</li>
+{% endfor %}
+  </ul>
+ </div>
+{% endif %}
+
+ <section class="card" id="monthly" aria-labelledby="h-month">
+  <h2 id="h-month">{{ t("home_month_heading") }}</h2>
+  <ul class="legend">
+   <li><span class="sw g" aria-hidden="true"></span>{{ t("fuel_gas") }}</li>
+   <li><span class="sw e" aria-hidden="true"></span>{{ t("fuel_electricity") }}</li>
+   <li><span class="dashsw" aria-hidden="true"></span>{{ t("home_legend_estimated") }}</li>
+   <li><span class="solidsw" aria-hidden="true"></span>{{ t("home_legend_exact") }}</li>
+  </ul>
+  <div class="chartwrap" role="region" aria-label="{{ tp('chart_title_monthly') }}" tabindex="0">{{ b.chart }}</div>
+  <p class="swipe">{{ t("home_swipe") }}</p>
+  <details>
+   <summary>{{ t("table_toggle") }}</summary>
+   <div class="tablewrap" role="region" aria-labelledby="cap-monthly" tabindex="0">
+    <table>
+     <caption id="cap-monthly">{{ t("home_table_caption") }}</caption>
+     <thead><tr><th scope="col">{{ t("col_month") }}</th><th scope="col" class="num">{{ t("col_kwh") }}</th><th scope="col" class="num">{{ t("col_therms") }}</th><th scope="col" class="num">{{ t("col_tco2e") }}</th><th scope="col">{{ t("col_source") }}</th></tr></thead>
+     <tbody>
+{% for r in b.rows %}
+      <tr><th scope="row">{{ r.month }}</th><td class="num">{{ r.kwh }}</td><td class="num">{{ r.therms }}</td><td class="num">{{ r.tco2e }}</td><td>{{ t("dq_estimated") if r.estimated else t("dq_exact") }}</td></tr>
+{% endfor %}
+      <tr class="total"><th scope="row">{{ t("row_total") }}</th><td class="num">{{ b.total_row.kwh }}</td><td class="num">{{ b.total_row.therms }}</td><td class="num">{{ b.total_row.tco2e }}</td><td></td></tr>
+     </tbody>
+    </table>
+   </div>
+  </details>
+ </section>
+{% else %}
+ <section class="card nobaseline" aria-labelledby="h-nobaseline">
+  <h2 id="h-nobaseline">{{ t("home_nobaseline_heading") }}</h2>
+  <p>{{ t("home_nobaseline_body") }}</p>
+ </section>
+{% endif %}
+
+{% set tr = v.travel %}
+{% if tr %}
+ <section class="card travel" id="travel" aria-labelledby="h-travel">
+  <span class="tag">{{ t("travel_tag") }}</span>
+  <h2 id="h-travel">{{ t("travel_heading") }}</h2>
+  <p class="category">{{ t("travel_category") }}</p>
+  <p class="intro-text">{{ t("travel_intro") }}</p>
+  <div class="stat">
+   <div><b>{{ tr.miles }}</b><span>{{ t("travel_stat_miles", quality=tr.quality) }}</span></div>
+{% if tr.charging %}
+   <div><b>{{ tr.charging }}</b><span>{{ t("travel_stat_charging") }}</span></div>
+{% endif %}
+{% if tr.avoided %}
+   <div><b>{{ tr.avoided }}</b><span>{{ t("travel_stat_avoided") }}</span></div>
+{% endif %}
+  </div>
+{% if not tr.avoided %}
+  <p class="intro-text">{{ t("travel_avoided_none") }}</p>
+{% endif %}
+  <div class="pending">
+   <p>{{ t("travel_not_netted") }}</p>
+   <p>{{ t("travel_basis", kwh100=tr.kwh100) }}</p>
+{% if tr.miles_per_day %}
+   <p>{{ t("travel_miles_estimate_note", miles_per_day=tr.miles_per_day) }}</p>
+{% else %}
+   <p>{{ t("travel_miles_odometer_note") }}</p>
+{% endif %}
+{% if tr.partial %}
+   <p>{{ t("travel_months_note", n=tr.months_entered) }}</p>
+{% endif %}
+{% if tr.charges_here %}
+   <p>{{ t("travel_charging_note") }}</p>
+{% endif %}
+{% if tr.charges_at_church %}
+   <p>{{ t("travel_already_counted") }}</p>
+{% endif %}
+  </div>
+ </section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,317 @@
+/*
+  Parish carbon dashboard.
+
+  Mobile first: the base rules are for a phone, and wider screens are added with min-width queries (561px for a
+  roomier header and no chart scrolling, 761px for the two-column layouts). Colours are tokens in :root.
+
+  The three brand tokens (--primary, --accent, --hatch) are placeholders: the build writes the parish's own
+  colours from parish.toml in their place (carbon.site.brand_stylesheet) and refuses colours that would fail
+  WCAG AA against the fixed colours below (carbon.settings.brand_contrast_problems). tests/test_site.py checks
+  every text and background pair for contrast (4.5:1). Nothing here loads from another site: the fonts are
+  self-hosted and the urls are relative to this file, so the site works under any address or path.
+*/
+
+@font-face {
+  font-family: "Noto Serif";
+  src: url("fonts/noto-serif-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Serif";
+  src: url("fonts/noto-serif-latin-wght-italic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Sans";
+  src: url("fonts/noto-sans-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Noto Sans";
+  src: url("fonts/noto-sans-latin-wght-italic.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --primary: #1F6B4A;
+  --accent: #F2C14E;
+  --hatch: #D5AA45;
+  --ink: #2B3440;
+  --muted: #56606E;
+  --bg: #F5F6F7;
+  --card: #FFFFFF;
+  --tint: #FBFCFC;
+  --soft: #EEF1F2;
+  --line: #DDE1E4;
+  --radius: 16px;
+  --serif: "Noto Serif", Georgia, serif;
+  --sans: "Noto Sans", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.55 var(--sans);
+}
+img { max-width: 100%; height: auto; }
+h1, h2, h3, .big {
+  font-family: var(--serif);
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 .4em;
+}
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; margin-top: 1rem; }
+p { margin: 0 0 .8em; }
+.card > :last-child { margin-bottom: 0; }
+a { color: var(--primary); }
+a:hover { color: var(--ink); }
+sub { font-size: .7em; line-height: 0; vertical-align: baseline; position: relative; top: .3em; }
+
+/* A two-tone ring, so the focus indicator shows on white, on the primary colour and on the page background. */
+a:focus-visible, summary:focus-visible, [tabindex="0"]:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+  border-radius: 4px;
+  box-shadow: 0 0 0 5px var(--accent);
+}
+
+.skip {
+  position: absolute;
+  left: -999px;
+  top: 0;
+  background: #fff;
+  color: var(--ink);
+  padding: .6rem 1rem;
+  z-index: 20;
+}
+.skip:focus { left: 8px; top: 8px; background: var(--accent); color: var(--ink); }
+
+/* ---- the sample-data banner: on every page until parish.toml says sample_data = false ---- */
+.sample {
+  margin: 0;
+  padding: .6rem 0;
+  background: var(--accent);
+  color: var(--ink);
+  border-bottom: 2px solid var(--ink);
+  font-size: .95rem;
+}
+.sample p { margin-top: 0; margin-bottom: 0; }
+
+/* ---- header ---- */
+header.top { background: var(--card); border-bottom: 1px solid var(--line); }
+.wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+.bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding-top: 14px; padding-bottom: 14px; }
+.brand { display: flex; align-items: center; gap: 14px; flex: 1 1 100%; min-width: 0; text-decoration: none; color: inherit; }
+.brand img { width: 48px; height: 48px; flex: none; }
+.brand .name { font: 600 .85rem/1.2 var(--sans); color: var(--muted); }
+.brand .name strong { display: block; color: var(--ink); font: 700 1.05rem/1.2 var(--serif); }
+.lang {
+  margin-left: 62px;
+  flex: none;
+  display: flex;
+  border: 1.5px solid var(--primary);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.lang a, .lang span { padding: .38rem .95rem; font: 600 .9rem var(--sans); text-decoration: none; color: var(--primary); }
+.lang span[aria-current] { background: var(--primary); color: #fff; }
+.lang a:focus-visible { border-radius: 999px; outline-offset: -3px; box-shadow: none; }
+
+nav.sub { border-top: 1px solid var(--line); background: var(--card); }
+/* The four links wrap onto a second row on a narrow phone instead of scrolling inside the strip: a link that
+   scrolls out of view cannot show keyboard focus (WCAG 2.4.7), and nothing here needs a sideways swipe. Each
+   link keeps a touch target of at least 44px. */
+nav.sub .wrap { display: flex; flex-wrap: wrap; gap: 0 6px; }
+nav.sub a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: .7rem .9rem;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--ink);
+  border-bottom: 3px solid transparent;
+}
+nav.sub a:hover { border-color: var(--line); }
+nav.sub a[aria-current="page"] { border-color: var(--primary); color: var(--primary); }
+nav.sub a:focus-visible { outline-offset: -5px; box-shadow: none; }
+
+/* ---- page ---- */
+main { padding: 28px 0 56px; }
+.intro { margin: 6px 0 22px; max-width: 62ch; }
+.intro h1 { font-size: clamp(1.9rem, 4.5vw, 2.7rem); }
+.intro p { color: var(--muted); font-size: 1.08rem; margin: 0; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin: 0 0 20px;
+}
+
+/* ---- the headline ---- */
+.hero { display: grid; gap: 22px; grid-template-columns: 1fr; align-items: center; border-top: 6px solid var(--primary); }
+.hero > * { min-width: 0; }
+.eyebrow { font-weight: 700; letter-spacing: .04em; text-transform: uppercase; font-size: .78rem; color: var(--primary); margin: 0 0 6px; }
+.big { font-size: clamp(3.2rem, 9vw, 5.2rem); margin: 0; color: var(--ink); }
+.big small { font: 600 1.1rem var(--sans); color: var(--muted); margin-left: .35rem; }
+.hero p.lead { margin: .5rem 0 0; color: var(--muted); }
+.badge {
+  display: inline-block;
+  background: var(--soft);
+  border: 1.5px dashed var(--ink);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: .82rem;
+  border-radius: 999px;
+  padding: .22rem .8rem;
+  margin-top: 12px;
+}
+.split { height: 34px; border-radius: 10px; overflow: hidden; display: flex; border: 1.5px solid var(--ink); }
+.split span { display: block; height: 100%; }
+.split .g { background: repeating-linear-gradient(45deg, var(--accent) 0 6px, var(--hatch) 6px 8px); }
+.split .e { background: var(--primary); }
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+.tile { border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--soft); }
+.tile .k { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: .9rem; }
+.tile .v { font: 700 1.5rem var(--serif); }
+.tile .s { color: var(--muted); font-size: .88rem; }
+.sw { width: 14px; height: 14px; border: 1.5px solid var(--ink); border-radius: 3px; display: inline-block; flex: none; }
+.sw.g { background: repeating-linear-gradient(45deg, var(--accent) 0 3px, var(--hatch) 3px 4px); }
+.sw.e { background: var(--primary); }
+
+.pending { background: var(--soft); border-left: 5px solid var(--accent); padding: 10px 14px; border-radius: 6px; font-size: .95rem; }
+.pending p { margin: 0 0 .5em; }
+.pending p:last-child { margin-bottom: 0; }
+.pending ul { margin: .2em 0 0; padding-left: 1.2rem; }
+.pending li { margin: .3em 0; }
+.pending.after-hero { margin: -6px 0 20px; }
+
+/* ---- the chart and its table ---- */
+.legend { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 6px 0 10px; padding: 0; font-size: .88rem; color: var(--muted); }
+.legend li { display: inline-flex; align-items: center; gap: 7px; }
+.dashsw, .solidsw { width: 20px; height: 12px; border: 1.5px solid var(--ink); border-radius: 2px; display: inline-block; }
+.dashsw { border-style: dashed; }
+.chartwrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.chart { width: 100%; height: auto; display: block; }
+.chartwrap .chart { min-width: 600px; }
+.swipe { display: block; font-size: .8rem; color: var(--muted); margin: 2px 0 0; }
+details { margin-top: 10px; }
+summary { cursor: pointer; font-weight: 700; color: var(--primary); }
+.tablewrap { overflow-x: auto; margin: 10px 0 1rem; }
+.tablewrap:last-child { margin-bottom: 0; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: .92rem; }
+caption { text-align: left; color: var(--muted); padding: 0 0 8px; }
+th, td { padding: .5rem .6rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+/* No text-transform: unit symbols are case-sensitive (kWh, t CO2e), so capitals would change their meaning. */
+thead th { font-size: .82rem; font-weight: 700; color: var(--muted); }
+tr.total th, tr.total td { font-weight: 800; border-top: 2px solid var(--ink); }
+td.url { overflow-wrap: anywhere; min-width: 14rem; }
+td.nowrap { white-space: nowrap; }
+
+/* ---- the travel line: its own card, never part of the campus chart ---- */
+.travel { border: 2px dashed var(--primary); background: var(--tint); }
+.travel .tag {
+  display: inline-block;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 6px;
+  padding: .15rem .55rem;
+  margin-bottom: 8px;
+}
+.travel .category { color: var(--muted); font-size: .9rem; margin: 0 0 .4em; }
+.travel .intro-text { color: var(--muted); margin: 0 0 .6em; }
+.stat { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px 26px; margin: 12px 0; }
+.stat b { display: block; font: 700 1.6rem var(--serif); }
+.stat span { color: var(--muted); font-size: .88rem; }
+
+/* ---- Data, Methodology and About ---- */
+.grid2 { display: grid; gap: 20px; grid-template-columns: 1fr; }
+.grid2 .card { margin: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 1rem; }
+.button {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: .5rem 1.1rem;
+  text-decoration: none;
+}
+.button:hover { background: var(--ink); color: #fff; }
+ul.clean, ul.files, ul.milestones { margin: .4rem 0 .8rem; padding-left: 1.1rem; }
+ul.clean li, ul.files li { margin: .35rem 0; }
+ul.milestones { list-style: none; padding-left: 0; }
+ul.milestones li { margin: .4rem 0; }
+ul.milestones time { font-weight: 700; display: inline-block; min-width: 8rem; margin-right: .5rem; }
+.nobaseline { border-top: 6px solid var(--accent); }
+
+footer { border-top: 1px solid var(--line); background: var(--card); padding: 22px 0; color: var(--muted); font-size: .9rem; }
+footer p { margin: 0 0 .4em; }
+
+/* ---- wider screens ---- */
+@media (min-width: 561px) {
+  .brand { flex: 0 1 auto; }
+  .brand .name { font-size: .95rem; }
+  .lang { margin-left: auto; }
+  .chartwrap .chart { min-width: 0; }
+  .swipe { display: none; }
+}
+@media (min-width: 761px) {
+  body { font-size: 17px; }
+  .card { padding: 24px; }
+  .hero { grid-template-columns: 1.1fr 1fr; }
+  .grid2 { grid-template-columns: 1fr 1fr; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .card { transition: box-shadow .2s; }
+  .card:hover { box-shadow: 0 6px 20px rgba(43, 52, 64, .08); }
+}
+
+/* ---- print ---- */
+@media print {
+  .skip, nav.sub, .lang, .swipe { display: none; }
+  body { background: #fff; font-size: 11pt; }
+  main { padding: 0; }
+  header.top, footer { border: 0; }
+  .card { break-inside: avoid; border-color: #bbb; box-shadow: none; }
+  .chartwrap { overflow: visible; }
+  .chartwrap .chart { min-width: 0; }
+  .tablewrap { overflow: visible; }
+  table { min-width: 0; }
+  a { color: var(--ink); }
+  /* The emission-factors table has six columns, the last holding long web addresses. It is laid out at the printed
+     width with the addresses allowed to break anywhere, so it stays inside the card instead of crossing its border. */
+  table.factors { table-layout: fixed; width: 100%; font-size: 9pt; }
+  table.factors th, table.factors td { padding: .35rem .4rem; overflow-wrap: anywhere; }
+  table.factors thead th:nth-child(1) { width: 17%; }
+  table.factors thead th:nth-child(2) { width: 13%; }
+  table.factors thead th:nth-child(3) { width: 15%; }
+  table.factors thead th:nth-child(4) { width: 22%; }
+  table.factors thead th:nth-child(5) { width: 13%; }
+  table.factors thead th:nth-child(6) { width: 20%; }
+  table.factors td.url { min-width: 0; }
+}
+@media print {
+  details::details-content { content-visibility: visible; }
+}

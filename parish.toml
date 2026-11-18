@@ -1,0 +1,83 @@
+# parish.toml: the settings for your parish's carbon dashboard.
+#
+# This is the only file you edit, besides the data files in the "data" folder.
+# Change the words between the quote marks. Keep the quote marks.
+# A line that starts with # is a note for you. The site ignores it.
+# If you make a mistake, nothing breaks: the site keeps its last good version,
+# and the "Actions" tab on GitHub tells you which line to fix.
+
+# While this is true, every page says "Sample data" in a banner at the top.
+# Change it to false when your own parish's details and readings are in.
+sample_data = true
+
+[organization]
+# The name shown at the top of every page.
+name = "St. Example Church"
+
+# A short name for computers: small letters, digits and hyphens only.
+# Leave it empty and it is made from the name, city and state.
+# Once your site is public, do not change it: others may use it to find your data.
+slug = ""
+
+# Where the parish is. State is the two-letter postal code. ZIP is five digits.
+city = "Springfield"
+state = "IL"
+zip = "62701"
+
+# The address people can write to with questions about the numbers. It is shown on the site.
+contact_email = "office@example.org"
+
+# Your parish website, starting with https://. Leave it empty if there is none.
+website = ""
+
+# How the site speaks of the buildings it counts. It is used inside sentences such as
+# "We count our church campus". If you also count a school or a hall, say so here:
+# "our church and school campus".
+campus_en = "our church campus"
+# The same in Spanish. Only used if the site is also built in Spanish.
+campus_es = "el campus de nuestra iglesia"
+
+[site]
+# The web address of the finished site. Leave it empty: GitHub fills it in for you.
+# Only type an address here if your parish gives the site its own, such as "https://carbon.example.org".
+base_url = ""
+
+# The languages of the site. ["en"] is English only. ["en", "es"] is English and Spanish.
+languages = ["en", "es"]
+
+[brand]
+# Your two colors, each written as # and six digits or letters (a "hex code").
+# The primary color is used for links, buttons and the electricity bars. It must be dark.
+primary_color = "#1F6B4A"
+# The accent color is used for highlights and the gas bars. It must be light.
+# If the two colors would make text hard to read, the site tells you and keeps its last good version.
+accent_color = "#F2C14E"
+
+# Your own logo: upload a square image next to this file and write its name here,
+# for example "logo.png". Leave it empty to use the leaf.
+logo = ""
+
+[grid]
+# The code of the electricity region ("eGRID subregion") your parish is in. Find it at
+# https://www.epa.gov/egrid/power-profiler : type your ZIP code and copy the short code
+# it shows, such as "RFCW". "RFCW" below belongs to the sample data. Replace it with yours.
+egrid_subregion = "RFCW"
+
+[baseline]
+# The first calendar year (January to December) for which you expect to have every bill.
+# Until all twelve months of that year are in, the site shows the latest twelve months
+# and calls them "provisional".
+calendar_year = 2025
+
+[travel]
+# Set this to false if you do not track church driving. The travel section then disappears.
+enabled = true
+# The name of the travel section, in English and in Spanish.
+label_en = "Clergy and staff church travel"
+label_es = "Viajes del clero y del personal por la iglesia"
+
+[privacy]
+# Words that must never appear on the public site. The site refuses to publish while one is found.
+# Example: ["rectory", "rectories"]. List each form of a word separately.
+# Dollar amounts and long numbers that look like account numbers are always refused. You do not need to list them.
+forbidden_words = []

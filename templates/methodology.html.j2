@@ -1,0 +1,78 @@
+{% extends "base.html.j2" %}
+{% block main %}
+ <div class="intro">
+  <h1>{{ t("method_h1") }}</h1>
+  <p>{{ t("method_intro") }}</p>
+ </div>
+
+ <section class="card" id="boundary" aria-labelledby="h-boundary">
+  <h2 id="h-boundary">{{ t("method_boundary_heading") }}</h2>
+  <p>{{ t("method_boundary_body") }}</p>
+ </section>
+
+ <section class="card" id="factors" aria-labelledby="h-factors">
+  <h2 id="h-factors">{{ t("method_factors_heading") }}</h2>
+  <p>{{ t("method_factors_body") }}</p>
+  <p>{{ t("method_grid_note") }}</p>
+{% if v.factors %}
+  <div class="tablewrap" role="region" aria-labelledby="cap-factors" tabindex="0">
+   <table class="factors">
+    <caption id="cap-factors">{{ t("method_factors_caption") }}</caption>
+    <thead><tr><th scope="col">{{ t("col_factor") }}</th><th scope="col">{{ t("col_value") }}</th><th scope="col">{{ t("col_edition") }}</th><th scope="col">{{ t("col_revision") }}</th><th scope="col">{{ t("col_retrieved") }}</th><th scope="col">{{ t("col_link") }}</th></tr></thead>
+    <tbody>
+{% for f in v.factors %}
+     <tr><th scope="row">{{ f.name }}</th><td>{{ f.value }} {{ f.unit }}</td><td>{{ f.edition }}</td><td>{{ f.revision }}</td><td class="nowrap">{{ f.retrieved }}</td><td class="url"><a href="{{ f.url }}">{{ f.url }}</a></td></tr>
+{% endfor %}
+    </tbody>
+   </table>
+  </div>
+{% endif %}
+  <p>{{ t("method_factors_recalc") }}</p>
+ </section>
+
+ <section class="card" id="billing" aria-labelledby="h-billing">
+  <h2 id="h-billing">{{ t("method_billing_heading") }}</h2>
+  <p>{{ t("method_billing_body") }}</p>
+ </section>
+
+ <section class="card" id="baseline" aria-labelledby="h-baseline">
+  <h2 id="h-baseline">{{ t("method_baseline_heading") }}</h2>
+  <p>{{ t("method_baseline_body") }}</p>
+ </section>
+
+ <section class="card" id="labels" aria-labelledby="h-labels">
+  <h2 id="h-labels">{{ t("method_labels_heading") }}</h2>
+  <p>{{ t("method_labels_intro") }}</p>
+  <ul class="clean">
+   <li>{{ t("method_dq_bill") }}</li>
+   <li>{{ t("method_dq_utility_export") }}</li>
+   <li>{{ t("method_dq_chart_estimate") }}</li>
+   <li>{{ t("method_dq_chart_measured") }}</li>
+  </ul>
+  <p>{{ t("method_dq_replaced") }}</p>
+ </section>
+
+ <section class="card" id="excluded" aria-labelledby="h-excluded">
+  <h2 id="h-excluded">{{ t("method_excluded_heading") }}</h2>
+  <p>{{ t("method_excluded_body" if v.has_travel else "method_excluded_body_no_travel") }}</p>
+ </section>
+
+{% if v.has_travel %}
+ <section class="card travel" id="travel" aria-labelledby="h-travel">
+  <span class="tag">{{ t("travel_tag") }}</span>
+  <h2 id="h-travel">{{ t("travel_heading") }}</h2>
+  <p>{{ t("method_travel_body") }}</p>
+  <h3>{{ t("method_avoided_heading") }}</h3>
+  <p>{{ t("method_avoided_body") }}</p>
+ </section>
+{% endif %}
+
+ <section class="card" id="terms" aria-labelledby="h-terms">
+  <h2 id="h-terms">{{ t("method_terms_heading") }}</h2>
+  <ul class="clean">
+   <li>{{ t("method_term_co2e") }}</li>
+   <li>{{ t("method_term_scope" if v.has_travel else "method_term_scope_no_travel") }}</li>
+   <li>{{ t("method_term_units") }}</li>
+  </ul>
+ </section>
+{% endblock %}
