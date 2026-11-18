@@ -1,0 +1,141 @@
+# Checks the parish's settings and data, builds the site and publishes it to GitHub Pages.
+#
+# It runs by itself every time a file is changed on the "main" branch (for example when a new month of
+# readings is committed in the browser), and it can be started by hand from the Actions tab.
+#
+# What a volunteer sees: a green tick when the site was checked and published, or a red cross with a
+# short list, on the run's Summary page, of what to fix and in which file. When something is wrong
+# nothing is published: the site keeps showing its last good version.
+#
+# Nothing here needs a password or a secret. The build has no access to anything but this repository.
+
+name: Check data and publish site
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      publish_anyway:
+        description: "Publish even if GitHub does not yet report Pages as switched on (leave unticked normally)"
+        type: boolean
+        default: false
+
+# The least each job needs. The deploy job below asks for its own two extra permissions.
+permissions:
+  contents: read
+
+# One publish at a time; a newer run waits for the one in progress instead of cutting it off half-way.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  # True once Pages is switched on for this repository (Settings, Pages, Source: GitHub Actions).
+  # A brand-new copy of the template has it off: the data is still checked, and only publishing is skipped.
+  PAGES_ON: ${{ github.event.repository.has_pages || inputs.publish_anyway || false }}
+
+jobs:
+  build:
+    name: Check the data and build the site
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - name: Get the files
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install the four libraries the build uses
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
+
+      # First, and before anything else can fail: is parish.toml right, and do the readings make sense?
+      # Every problem is written in plain words to the run's Summary page (and to this log).
+      - name: Check the settings and the data
+        run: |
+          python -m carbon.build \
+            --out "$RUNNER_TEMP/data-check" \
+            --generated-at "$(date -u +%F)" \
+            --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Run the program's own tests
+        run: |
+          if ! python -m pytest -q; then
+            {
+              echo "### The program's own tests failed"
+              echo
+              echo "Your settings and data passed their check (see above), so this is most likely not about"
+              echo "a reading you typed. It usually means a file other than \`parish.toml\` or the files in"
+              echo "\`data/\` was changed. Nothing was published. Open this run's log for the failing test,"
+              echo "or undo the last change to those other files."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+
+      # Asks GitHub for the address the site is served at, such as https://someone.github.io/repo-name.
+      # Skipped while Pages is off, because the question has no answer yet.
+      - name: Ask GitHub where the site lives
+        id: pages
+        if: env.PAGES_ON == 'true'
+        uses: actions/configure-pages@v5
+
+      # The address from GitHub is used only when parish.toml leaves [site] base_url empty.
+      - name: Build the site
+        env:
+          PAGES_BASE_URL: ${{ steps.pages.outputs.base_url }}
+        run: |
+          python -m carbon.build \
+            --out dist \
+            --generated-at "$(date -u +%F)" \
+            --base-url "$PAGES_BASE_URL"
+
+      - name: Hand the built site to the publishing job
+        if: env.PAGES_ON == 'true'
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+      - name: Say why nothing was published yet
+        if: env.PAGES_ON != 'true'
+        run: |
+          {
+            echo "### Checked, but not published yet"
+            echo
+            echo "The site built without problems, but GitHub Pages is not switched on for this repository,"
+            echo "so there is nowhere to publish it. To switch it on: **Settings**, then **Pages**, then under"
+            echo "**Build and deployment** set **Source** to **GitHub Actions**. Then come back to the"
+            echo "**Actions** tab, choose **Check data and publish site** and press **Run workflow**."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  deploy:
+    name: Publish to GitHub Pages
+    needs: build
+    # Only when Pages is switched on. A new copy of the template skips this job; it does not fail.
+    if: ${{ github.event.repository.has_pages || inputs.publish_anyway }}
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publish
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Say where the site is
+        env:
+          PAGE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: |
+          {
+            echo "### Published"
+            echo
+            echo "The site is live at $PAGE_URL"
+          } >> "$GITHUB_STEP_SUMMARY"
