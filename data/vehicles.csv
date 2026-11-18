@@ -1,0 +1,2 @@
+vehicle_id,label,kwh_per_mile,charging_place,charging_grid_region,kwh_per_mile_source,note
+staff-ev,Sample staff car,0.3,home,RFCW,"Sample figure, made up for this template and not taken from any real car. Replace it with the figure for your exact model from the fuel economy label at fueleconomy.gov: the combined kWh per 100 miles, divided by 100.","Sample vehicle, charged away from the campus meters."
