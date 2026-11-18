@@ -102,11 +102,11 @@ def test_every_action_is_an_official_one_pinned_to_a_major_version(workflow):
     used = re.findall(r"uses: (\S+)", workflow)
     assert sorted(used) == sorted(
         [
-            "actions/checkout@v5",
-            "actions/setup-python@v6",
-            "actions/configure-pages@v5",
-            "actions/upload-pages-artifact@v4",
-            "actions/deploy-pages@v4",
+            "actions/checkout@v7",
+            "actions/setup-python@v7",
+            "actions/configure-pages@v6",
+            "actions/upload-pages-artifact@v5",
+            "actions/deploy-pages@v5",
         ]
     )
     for action in used:
@@ -152,7 +152,7 @@ def test_the_published_build_uses_githubs_pages_address_and_todays_utc_date(work
     # The address is passed through the environment, never pasted into the command line by GitHub.
     assert "${{" not in build.split("run: |")[1]
     upload = workflow[workflow.index("Hand the built site") : workflow.index("Say why nothing was published yet")]
-    assert "actions/upload-pages-artifact@v4" in upload and "path: dist" in upload
+    assert "actions/upload-pages-artifact@v5" in upload and "path: dist" in upload
 
 
 def test_a_copy_without_pages_is_checked_and_passes_and_only_publishing_is_skipped(workflow):
@@ -172,7 +172,7 @@ def test_a_copy_without_pages_is_checked_and_passes_and_only_publishing_is_skipp
     deploy = workflow[workflow.index("\n  deploy:") :]
     assert "needs: build" in deploy
     assert "if: ${{ github.event.repository.has_pages || inputs.publish_anyway }}" in deploy
-    assert "name: github-pages" in deploy and "actions/deploy-pages@v4" in deploy
+    assert "name: github-pages" in deploy and "actions/deploy-pages@v5" in deploy
 
 
 def test_one_publish_runs_at_a_time_and_is_never_cut_off(workflow):

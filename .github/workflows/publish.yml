@@ -44,10 +44,10 @@ jobs:
       pages: read
     steps:
       - name: Get the files
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -83,7 +83,7 @@ jobs:
       - name: Ask GitHub where the site lives
         id: pages
         if: env.PAGES_ON == 'true'
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
 
       # The address from GitHub is used only when parish.toml leaves [site] base_url empty.
       - name: Build the site
@@ -97,7 +97,7 @@ jobs:
 
       - name: Hand the built site to the publishing job
         if: env.PAGES_ON == 'true'
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist
 
@@ -128,7 +128,7 @@ jobs:
     steps:
       - name: Publish
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: Say where the site is
         env:

@@ -142,3 +142,32 @@ def test_the_spanish_text_keeps_the_proper_names_dates_and_revision_numbers_of_t
         for text in (factor.edition_es, factor.revision_es):
             for english in ("released", "Revision", "Last Modified", "January", "listed", "page last", "data,", "printed"):
                 assert english not in text, f"{factor.factor_id}: {text!r} still has {english!r}"
+
+
+# The 27 subregions of EPA eGRID2023 (Table 1 of the summary tables). A parish anywhere in the US, Alaska,
+# Hawaii or Puerto Rico must find its own code in data/factors.csv.
+EGRID_SUBREGIONS = (
+    "AKGD AKMS AZNM CAMX ERCT FRCC HIMS HIOA MROE MROW NEWE NWPP NYCW NYLI NYUP PRMS RFCE RFCM RFCW RMPA "
+    "SPNO SPSO SRMV SRMW SRSO SRTV SRVC"
+).split()
+
+
+def test_the_factors_file_holds_every_egrid_subregion():
+    ids = {f.factor_id for f in _repo_factors()}
+    missing = [s for s in EGRID_SUBREGIONS if f"{GRID_FACTOR_PREFIX}{s.lower()}" not in ids]
+    assert not missing, f"no electricity row for {missing}"
+    assert len(EGRID_SUBREGIONS) == 27
+
+
+def test_every_electricity_value_is_the_conversion_of_the_rate_printed_in_its_own_source():
+    """Each row quotes EPA's CO2e rate in lb/MWh; the stored kg/kWh value must be that rate times 0.45359237 / 1000."""
+    from decimal import ROUND_HALF_UP, Decimal
+
+    rows = [f for f in _repo_factors() if f.factor_id.startswith(GRID_FACTOR_PREFIX)]
+    assert len(rows) >= 27
+    for f in rows:
+        sub = f.factor_id[len(GRID_FACTOR_PREFIX):].upper()
+        m = re.search(rf"{sub} \([^)]+\): CO2e ([\d.]+) lb/MWh as printed", f.source)
+        assert m, f"{f.factor_id}: the source text does not quote the {sub} rate in lb/MWh"
+        expected = (Decimal(m.group(1)) * Decimal("0.45359237") / 1000).quantize(Decimal("0.0000001"), rounding=ROUND_HALF_UP)
+        assert Decimal(str(f.value)).quantize(Decimal("0.0000001")) == expected, f"{f.factor_id}: {f.value} is not {expected}"

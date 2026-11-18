@@ -111,8 +111,8 @@ FILES: tuple[FeedFile, ...] = (
              "One row per meter per billing month: quantity, unit, tonnes CO2e, data quality and factor id."),
     FeedFile("monthly_csv", "monthly.csv", "text/csv", None, "The rows of monthly.json as CSV."),
     FeedFile("annual", "annual.json", "application/json", "annual",
-             "The baseline and every complete twelve-month period, with campus totals by fuel (scope 1 and 2), "
-             "and a separate staff travel block (scope 3) that is never added to the campus totals."),
+             "The baseline and every complete twelve-month period, with campus totals by fuel (scope 1 and 2). "
+             "Where staff travel is tracked it is a separate block (scope 3), never added to the campus totals."),
     FeedFile("travel", "travel.json", "application/json", "travel",
              "Staff travel by vehicle slug and billing month: miles, emissions where counted here and the "
              "avoided figure (scope 3)."),
@@ -120,7 +120,7 @@ FILES: tuple[FeedFile, ...] = (
     FeedFile("factors", "factors.json", "application/json", "factors",
              "Every emission factor with value, unit, source, edition, revision, URL and retrieval date."),
     FeedFile("milestones", "milestones.json", "application/json", "milestones",
-             "Dated milestones such as a boiler installation, in English and Spanish."),
+             "Dated milestones such as a boiler installation, labelled in each language of the site."),
     FeedFile("openapi", "openapi.json", "application/json", None, "OpenAPI description of these read-only paths."),
     FeedFile("changelog", "CHANGELOG.md", "text/markdown", None, "Changes to the feed, newest first."),
 )
